@@ -4,6 +4,7 @@ export default function Navbar({ cantidad }) {
   return (
     <nav className="nav">
       <h2>ProFerr 🏗️</h2>
+
       <div>
         <Link to="/">Inicio</Link>
         <Link to="/productos">Productos</Link>
