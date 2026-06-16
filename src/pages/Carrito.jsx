@@ -8,10 +8,33 @@ const formatPrice = (value) =>
 export default function Carrito({ carrito, eliminar, limpiar }) {
   const navigate = useNavigate();
 
+  const obtenerProductoFerreteria = (item) => {
+    return (
+      item.productoEncontrado ||
+      item.productoFerreteria ||
+      item.nombreProducto ||
+      item.nombre ||
+      "Producto no informado"
+    );
+  };
+
+  const obtenerMaterialSolicitado = (item) => {
+    return (
+      item.materialSolicitado ||
+      item.nombreMaterial ||
+      item.material ||
+      item.nombre ||
+      "Material no informado"
+    );
+  };
+
   const obtenerUnidad = (item) => {
     if (item.unidadVenta) return item.unidadVenta;
+    if (item.unidad) return item.unidad;
 
-    const nombre = (item.nombre || "").toLowerCase();
+    const nombre = `${obtenerProductoFerreteria(item)} ${obtenerMaterialSolicitado(
+      item
+    )}`.toLowerCase();
 
     if (nombre.includes("cemento")) return "sacos";
     if (nombre.includes("arena")) return "m³";
@@ -21,7 +44,16 @@ export default function Carrito({ carrito, eliminar, limpiar }) {
     if (nombre.includes("zinc")) return "planchas";
     if (nombre.includes("costanera")) return "unidades";
     if (nombre.includes("perfil")) return "unidades";
+    if (nombre.includes("canal")) return "unidades";
+    if (nombre.includes("montante")) return "unidades";
     if (nombre.includes("yeso")) return "planchas";
+    if (nombre.includes("osb")) return "unidades";
+    if (nombre.includes("teja")) return "unidades";
+    if (nombre.includes("fieltro")) return "rollos";
+    if (nombre.includes("clavo")) return "unidades";
+    if (nombre.includes("policarbonato")) return "unidades";
+    if (nombre.includes("cinta")) return "rollos";
+    if (nombre.includes("pino")) return "unidades";
 
     return "unidades";
   };
@@ -30,9 +62,15 @@ export default function Carrito({ carrito, eliminar, limpiar }) {
     return Number(item.precio || item.precioUnitario || 0);
   };
 
+  const obtenerCantidad = (item) => {
+    return Number(item.cantidadParaCompra || item.cantidad || 0);
+  };
+
   const obtenerSubtotal = (item) => {
+    if (item.subtotal) return Number(item.subtotal);
+
     const precio = obtenerPrecio(item);
-    const cantidad = Number(item.cantidad || 0);
+    const cantidad = obtenerCantidad(item);
 
     return precio * cantidad;
   };
@@ -50,23 +88,45 @@ export default function Carrito({ carrito, eliminar, limpiar }) {
       ) : (
         <>
           <p>
-            Productos seleccionados desde la cotización de <strong>ProFerr</strong>.
+            Materiales cotizados desde ConstruFácil en{" "}
+            <strong>ProFerr</strong>.
           </p>
 
-          {carrito.map((item) => {
+          <p>
+            <strong>Productos en carrito:</strong> {carrito.length}
+          </p>
+
+          {carrito.map((item, index) => {
+            const productoFerreteria = obtenerProductoFerreteria(item);
+            const materialSolicitado = obtenerMaterialSolicitado(item);
             const precio = obtenerPrecio(item);
+            const cantidad = obtenerCantidad(item);
             const subtotal = obtenerSubtotal(item);
             const unidad = obtenerUnidad(item);
 
+            const mostrarProductoFerreteria =
+              productoFerreteria.toLowerCase() !==
+              materialSolicitado.toLowerCase();
+
             return (
-              <div key={item.id} className="carrito-item">
+              <div
+                key={item.id || `${productoFerreteria}-${index}`}
+                className="carrito-item"
+              >
                 <div>
-                  <strong>{item.nombre}</strong>
+                  <strong>{materialSolicitado}</strong>
+
+                  {mostrarProductoFerreteria && (
+                    <p>
+                      Producto ferretería:{" "}
+                      <strong>{productoFerreteria}</strong>
+                    </p>
+                  )}
 
                   <p>Precio unitario: ${formatPrice(precio)}</p>
 
                   <p>
-                    Cantidad para compra: {Number(item.cantidad || 0)} {unidad}
+                    Cantidad para compra: {cantidad} {unidad}
                   </p>
                 </div>
 

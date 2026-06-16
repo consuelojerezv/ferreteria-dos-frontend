@@ -282,3 +282,14 @@ button.secondary,
   flex-wrap: wrap;
   gap: 16px;
 }
+.carrito-item p {
+  margin: 8px 0;
+}
+
+.carrito-item strong {
+  color: #0f172a;
+}
+
+.carrito-actions span {
+  font-weight: 700;
+}
